@@ -1,5 +1,6 @@
 from pages.base_page import BasePage
 from pages.locators import ProductPageLocators
+import re
 import math
 # import time
 
@@ -9,13 +10,36 @@ class ProductPage(BasePage):
         add_button.click()
         # time.sleep(5)
 
-    # def should_be_success_message(self):
-    #     assert self.is_element_present(*ProductPageLocators.SUCCESS_MESSAGE), "Success message is not present"
+    def should_be_success_message(self):
+        assert self.is_element_present(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Success message is present on the page."
 
-    # def should_be_correct_product_name(self):
-    #     product_name = self.browser.find_element(*ProductPageLocators.PRODUCT_NAME).text
-    #     success_message = self.browser.find_element(*ProductPageLocators.SUCCESS_MESSAGE).text
-    #     assert product_name in success_message, "Product name is not in the success message"
+    def should_not_be_success_message(self):
+        assert self.is_not_element_present(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Success message is presented, but should not be."
+
+    def should_disappear_success_message(self):
+        assert self.is_disappeared(*ProductPageLocators.SUCCESS_MESSAGE), \
+            "Success message did not disappear from the page."
+
+    def should_be_correct_product_name(self):
+        # Получаем имя продукта
+        product_name = self.browser.find_element(*ProductPageLocators.PRODUCT_NAME).text
+    
+        # Получаем сообщение об успешном добавлении продукта
+        success_message = self.browser.find_element(*ProductPageLocators.SUCCESS_MESSAGE).text
+    
+        # Логируем информацию для отладки
+        print(f"Product name on the page: {product_name}")
+        print(f"Success message: {success_message}")
+    
+        # Ожидаемое сообщение имеет формат: "{product_name} был добавлен в вашу корзину."
+        # Для извлечения product_name из success_message, удалим часть сообщения после первого пробела
+        expected_message_prefix = f"{product_name} был добавлен в вашу корзину."
+    
+        # Проверяем, что сообщение точно соответствует ожидаемому формату
+        assert success_message == expected_message_prefix, \
+            f"Expected success message '{expected_message_prefix}', but got '{success_message}'"
 
     # def should_be_correct_product_price(self):
     #     product_price = self.browser.find_element(*ProductPageLocators.PRODUCT_PRICE).text
@@ -35,4 +59,3 @@ class ProductPage(BasePage):
             alert.accept()
         except :
             print("No second alert presented")
-        # time.sleep(5)
